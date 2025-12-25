@@ -52,12 +52,12 @@ function App() {
         </div>
 
         {/* Hero Text */}
-        <div className="mb-6 relative w-full">
+        {/* <div className="mb-6 relative w-full">
           <h1 className="text-5xl md:text-9xl font-black mb-2 tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white via-blue-100 to-blue-900 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] break-words">
             COMING SOON
           </h1>
           <div className="h-1 w-24 md:w-48 bg-gradient-to-r from-transparent via-cyan-500 to-transparent mx-auto opacity-50"></div>
-        </div>
+        </div> */}
         
         {/* Description Text */}
         <div className="w-full max-w-4xl mx-auto mb-8 md:mb-12 relative px-4 text-center">
