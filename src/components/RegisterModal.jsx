@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { registerUser } from '../services/api';
+import { registerUser } from '../services/core.service';
 
 const RegisterModal = ({ isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -30,7 +30,8 @@ const RegisterModal = ({ isOpen, onClose, onSuccess }) => {
     try {
       const response = await registerUser(formData);
       if (response.status === 'success') {
-        onSuccess(response.data);
+        // Response structure: { status: 'success', data: { user, token, message } }
+        onSuccess(response);
         onClose();
       }
     } catch (err) {

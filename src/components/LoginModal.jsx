@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { loginUser } from '../services/api';
+import { loginUser } from '../services/core.service';
 
 const LoginModal = ({ isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -26,7 +26,8 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
     try {
       const response = await loginUser(formData);
       if (response.status === 'success') {
-        onSuccess(response.data);
+        // Response structure: { status: 'success', data: { user, token, message } }
+        onSuccess(response);
         onClose();
       }
     } catch (err) {

@@ -9,28 +9,57 @@ import LandingPage from './components/LandingPage';
 import Navbar from './components/Navbar';
 import RegisterModal from './components/RegisterModal';
 import LoginModal from './components/LoginModal';
+import UserProfile from './pages/UserProfile';
+import WalletPage from './pages/Wallet';
 import { Search, Bell, User, LogOut } from 'lucide-react';
-import { isAuthenticated, setToken, removeToken } from './utils/auth';
+import { isAuthenticated, setToken } from './utils/auth';
+import { useUser } from './context/UserContext';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { user, clearUser, fetchUserData } = useUser();
 
   useEffect(() => {
     // Check if token exists, if not redirect to home
     if (!isAuthenticated()) {
       navigate('/');
+      return;
     }
+    
+    // If user data not loaded, fetch it
+    if (!user) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          if (payload.userId) {
+            console.log('Dashboard: Fetching user data for userId:', payload.userId);
+            fetchUserData(payload.userId);
+          }
+        } catch (error) {
+          console.error('Dashboard: Error decoding token:', error);
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   const handleLogout = () => {
-    removeToken();
+    clearUser();
     navigate('/');
+  };
+
+  const handleUserIconClick = () => {
+    // Navigate to user profile page
+    navigate('/profile');
   };
 
   // If not authenticated, don't render dashboard
   if (!isAuthenticated()) {
     return null;
   }
+
+  const userName = user?.name || 'User';
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans pb-20 md:pb-0">
@@ -44,11 +73,15 @@ const Dashboard = () => {
         <header className="px-4 py-4 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-40 md:px-8 border-b border-gray-200/50">
           <div className="flex items-center gap-2">
               {/* User Profile / Menu placeholder */}
-              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+              <button
+                onClick={handleUserIconClick}
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200 hover:bg-gray-200 transition-colors cursor-pointer"
+                title="Refresh user data"
+              >
                   <User size={16} className="text-gray-600" />
-              </div>
+              </button>
               <div>
-                  <h1 className="text-sm font-bold text-gray-800">Hello, User!</h1>
+                  <h1 className="text-sm font-bold text-gray-800">Hello, {userName}!</h1>
                   <p className="text-[10px] text-gray-500">Welcome back</p>
               </div>
           </div>
@@ -95,6 +128,7 @@ const Dashboard = () => {
 
 const Home = () => {
   const navigate = useNavigate();
+  const { login, fetchUserData } = useUser();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
@@ -113,20 +147,40 @@ const Home = () => {
     setShowLoginModal(true);
   };
 
-  const handleRegisterSuccess = (data) => {
-    // If token is returned, save it
-    if (data.token) {
-      setToken(data.token);
+  const handleRegisterSuccess = async (responseData) => {
+    // Response structure: { status: 'success', data: { user, wallet, message } }
+    // Note: Register doesn't return token, so we need to fetch user by ID
+    const data = responseData?.data || responseData;
+    
+    if (data.user?._id) {
+      // Fetch user by ID to get complete user data
+      console.log('handleRegisterSuccess: Fetching user by ID:', data.user._id);
+      await fetchUserData(data.user._id);
+      navigate('/dashboard');
+    } else {
+      console.warn('handleRegisterSuccess: No user ID found in response');
+      navigate('/dashboard');
     }
-    navigate('/dashboard');
   };
 
-  const handleLoginSuccess = (data) => {
-    // Save token
+  const handleLoginSuccess = async (responseData) => {
+    // Response structure: { status: 'success', data: { user, token, message } }
+    const data = responseData?.data || responseData;
+    
     if (data.token) {
-      setToken(data.token);
+      // Login returns token, so decode and fetch user by ID
+      console.log('handleLoginSuccess: Token received, fetching user data');
+      await login(data.token, data.user);
+      navigate('/dashboard');
+    } else if (data.user?._id) {
+      // If no token but user data, fetch user by ID
+      console.log('handleLoginSuccess: No token, fetching user by ID:', data.user._id);
+      await fetchUserData(data.user._id);
+      navigate('/dashboard');
+    } else {
+      console.warn('handleLoginSuccess: No token or user ID found');
+      navigate('/dashboard');
     }
-    navigate('/dashboard');
   };
 
   // If authenticated, don't show home
@@ -161,6 +215,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/wallet" element={<WalletPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
