@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { registerUser } from '../services/core.service';
+import { registerUser } from '../../services/core.service';
 
 const RegisterModal = ({ isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({

@@ -1,17 +1,15 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Banknote, Trophy, HelpCircle } from 'lucide-react';
+import { useUser } from '../../context/UserContext';
+import { getBottomNavItems } from '../../config/navigationConfig';
 
 const BottomNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useUser();
 
-  const navItems = [
-    { icon: Home, label: 'Home', path: '/dashboard' },
-    { icon: Banknote, label: 'Earnings', path: '/wallet' },
-    { icon: Trophy, label: 'Leaderboards', path: '/leaderboards' },
-    { icon: HelpCircle, label: 'How it works?', path: '/how-it-works' },
-  ];
+  // Get navigation items from centralized config
+  const navItems = getBottomNavItems(user?.userType || 'user');
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -45,3 +43,4 @@ const BottomNavigation = () => {
 };
 
 export default BottomNavigation;
+

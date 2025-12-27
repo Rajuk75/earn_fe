@@ -4,7 +4,7 @@ import { ArrowLeft, Wallet, Lock, Calendar, RefreshCw } from 'lucide-react';
 import { isAuthenticated } from '../utils/auth';
 import { useUser } from '../context/UserContext';
 import { getWalletByUserId } from '../services/core.service';
-import BottomNavigation from '../components/BottomNavigation';
+import { APP_ROUTES } from '../routes/appRoutes';
 
 const WalletPage = () => {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const WalletPage = () => {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate('/');
+      navigate(APP_ROUTES.HOME);
       return;
     }
 
@@ -78,19 +78,17 @@ const WalletPage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-          <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <ArrowLeft size={20} className="text-gray-600" />
-            </button>
-            <h1 className="text-xl font-bold text-gray-900">Wallet</h1>
-          </div>
-        </header>
-        <main className="max-w-4xl mx-auto px-4 py-8">
+      <div className="py-6 md:py-8">
+        <div className="mb-6 flex items-center gap-4">
+          <button
+            onClick={() => navigate(APP_ROUTES.USER_DASHBOARD)}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <ArrowLeft size={20} className="text-gray-600" />
+          </button>
+          <h1 className="text-xl font-bold text-gray-900">Wallet</h1>
+        </div>
+        <div className="max-w-4xl mx-auto">
           <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
             <p className="text-red-700 mb-4">{error}</p>
             <button
@@ -100,9 +98,6 @@ const WalletPage = () => {
               Retry
             </button>
           </div>
-        </main>
-        <div className="md:hidden">
-          <BottomNavigation />
         </div>
       </div>
     );
@@ -110,54 +105,47 @@ const WalletPage = () => {
 
   if (!wallet) {
     return (
-      <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-          <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <ArrowLeft size={20} className="text-gray-600" />
-            </button>
-            <h1 className="text-xl font-bold text-gray-900">Wallet</h1>
-          </div>
-        </header>
-        <main className="max-w-4xl mx-auto px-4 py-8">
+      <div className="py-6 md:py-8">
+        <div className="mb-6 flex items-center gap-4">
+          <button
+            onClick={() => navigate(APP_ROUTES.USER_DASHBOARD)}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <ArrowLeft size={20} className="text-gray-600" />
+          </button>
+          <h1 className="text-xl font-bold text-gray-900">Wallet</h1>
+        </div>
+        <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-xl p-6 text-center">
             <p className="text-gray-600">No wallet data found</p>
           </div>
-        </main>
-        <div className="md:hidden">
-          <BottomNavigation />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ArrowLeft size={20} className="text-gray-600" />
-          </button>
-          <h1 className="text-xl font-bold text-gray-900">Wallet</h1>
-          <button
-            onClick={loadWalletData}
-            className="ml-auto p-2 hover:bg-gray-100 rounded-full transition-colors"
-            title="Refresh"
-          >
-            <RefreshCw size={20} className="text-gray-600" />
-          </button>
-        </div>
-      </header>
+    <div className="py-6 md:py-8">
+      {/* Page Header */}
+      <div className="mb-6 flex items-center gap-4">
+        <button
+          onClick={() => navigate(APP_ROUTES.USER_DASHBOARD)}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <ArrowLeft size={20} className="text-gray-600" />
+        </button>
+        <h1 className="text-xl font-bold text-gray-900">Wallet</h1>
+        <button
+          onClick={loadWalletData}
+          className="ml-auto p-2 hover:bg-gray-100 rounded-full transition-colors"
+          title="Refresh"
+        >
+          <RefreshCw size={20} className="text-gray-600" />
+        </button>
+      </div>
 
       {/* Wallet Content */}
-      <main className="max-w-4xl mx-auto px-4 py-6 md:py-8">
+      <div className="max-w-4xl mx-auto">
         {/* Balance Card */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-6 md:p-8 mb-6 text-white">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
@@ -256,11 +244,6 @@ const WalletPage = () => {
             </div>
           </div>
         </div>
-      </main>
-
-      {/* Bottom Navigation (Mobile Only) */}
-      <div className="md:hidden">
-        <BottomNavigation />
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { ArrowLeft, User, Mail, Phone, Shield, Gift, Calendar, Edit } from 'luci
 import { isAuthenticated } from '../utils/auth';
 import { useUser } from '../context/UserContext';
 import { getUserById } from '../services/core.service';
-import BottomNavigation from '../components/BottomNavigation';
+import { APP_ROUTES } from '../routes/appRoutes';
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const UserProfile = () => {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      navigate('/');
+      navigate(APP_ROUTES.HOME);
       return;
     }
 
@@ -63,22 +63,20 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ArrowLeft size={20} className="text-gray-600" />
-          </button>
-          <h1 className="text-xl font-bold text-gray-900">Profile</h1>
-        </div>
-      </header>
+    <div className="py-6 md:py-8">
+      {/* Page Header */}
+      <div className="mb-6 flex items-center gap-4">
+        <button
+          onClick={() => navigate(APP_ROUTES.USER_DASHBOARD)}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <ArrowLeft size={20} className="text-gray-600" />
+        </button>
+        <h1 className="text-xl font-bold text-gray-900">Profile</h1>
+      </div>
 
       {/* Profile Content */}
-      <main className="max-w-4xl mx-auto px-4 py-6 md:py-8">
+      <div className="max-w-4xl mx-auto">
         {/* Profile Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           {/* Profile Header */}
@@ -223,11 +221,6 @@ const UserProfile = () => {
             </div>
           </div>
         </div>
-      </main>
-
-      {/* Bottom Navigation (Mobile Only) */}
-      <div className="md:hidden">
-        <BottomNavigation />
       </div>
     </div>
   );

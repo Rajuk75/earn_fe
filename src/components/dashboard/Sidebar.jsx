@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Home, Banknote, Trophy, HelpCircle, LogOut } from 'lucide-react';
-import { useUser } from '../context/UserContext';
-import { getWalletByUserId } from '../services/core.service';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { LogOut, Banknote } from 'lucide-react';
+import { useUser } from '../../context/UserContext';
+import { getWalletByUserId } from '../../services/core.service';
+import { getSidebarItems } from '../../config/navigationConfig';
 
 const Sidebar = ({ onLogout }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useUser();
   const [wallet, setWallet] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -52,16 +54,12 @@ const Sidebar = ({ onLogout }) => {
     }
   };
 
-  const handleEarningsClick = () => {
-    navigate('/wallet');
-  };
-
-  const navItems = [
-    { icon: Home, label: 'Home', active: true, onClick: () => navigate('/dashboard') },
-    { icon: Banknote, label: 'Earnings', active: false, onClick: handleEarningsClick },
-    { icon: Trophy, label: 'Leaderboards', active: false },
-    { icon: HelpCircle, label: 'How it works?', active: false },
-  ];
+  // Get navigation items from centralized config
+  const navItems = getSidebarItems(user?.userType || 'user').map(item => ({
+    ...item,
+    active: location.pathname === item.path,
+    onClick: () => navigate(item.path),
+  }));
 
   return (
     <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 p-6 z-50">
@@ -137,3 +135,4 @@ const Sidebar = ({ onLogout }) => {
 };
 
 export default Sidebar;
+

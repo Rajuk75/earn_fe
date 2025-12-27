@@ -1,130 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import HeroBanner from './components/HeroBanner';
-import CategoryRow from './components/CategoryRow';
-import FeaturedOffersGrid from './components/FeaturedOffersGrid';
-import BottomNavigation from './components/BottomNavigation';
-import Sidebar from './components/Sidebar';
-import LandingPage from './components/LandingPage';
-import Navbar from './components/Navbar';
-import RegisterModal from './components/RegisterModal';
-import LoginModal from './components/LoginModal';
-import UserProfile from './pages/UserProfile';
-import WalletPage from './pages/Wallet';
-import { Search, Bell, User, LogOut } from 'lucide-react';
-import { isAuthenticated, setToken } from './utils/auth';
+import Navbar from './components/common/Navbar';
+import LandingPage from './components/common/LandingPage';
+import RegisterModal from './components/auth/RegisterModal';
+import LoginModal from './components/auth/LoginModal';
+import UserLayout from './layouts/UserLayout';
+import AdminLayout from './layouts/AdminLayout';
+import { isAuthenticated } from './utils/auth';
 import { useUser } from './context/UserContext';
-
-const Dashboard = () => {
-  const navigate = useNavigate();
-  const { user, clearUser, fetchUserData } = useUser();
-
-  useEffect(() => {
-    // Check if token exists, if not redirect to home
-    if (!isAuthenticated()) {
-      navigate('/');
-      return;
-    }
-    
-    // If user data not loaded, fetch it
-    if (!user) {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          if (payload.userId) {
-            console.log('Dashboard: Fetching user data for userId:', payload.userId);
-            fetchUserData(payload.userId);
-          }
-        } catch (error) {
-          console.error('Dashboard: Error decoding token:', error);
-        }
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
-
-  const handleLogout = () => {
-    clearUser();
-    navigate('/');
-  };
-
-  const handleUserIconClick = () => {
-    // Navigate to user profile page
-    navigate('/profile');
-  };
-
-  // If not authenticated, don't render dashboard
-  if (!isAuthenticated()) {
-    return null;
-  }
-
-  const userName = user?.name || 'User';
-
-  return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans pb-20 md:pb-0">
-      {/* Desktop Sidebar */}
-      <Sidebar onLogout={handleLogout} />
-
-      {/* Main Content Wrapper */}
-      <div className="md:pl-64 transition-all duration-300">
-        
-        {/* Top Header */}
-        <header className="px-4 py-4 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-40 md:px-8 border-b border-gray-200/50">
-          <div className="flex items-center gap-2">
-              {/* User Profile / Menu placeholder */}
-              <button
-                onClick={handleUserIconClick}
-                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200 hover:bg-gray-200 transition-colors cursor-pointer"
-                title="Refresh user data"
-              >
-                  <User size={16} className="text-gray-600" />
-              </button>
-              <div>
-                  <h1 className="text-sm font-bold text-gray-800">Hello, {userName}!</h1>
-                  <p className="text-[10px] text-gray-500">Welcome back</p>
-              </div>
-          </div>
-          <div className="flex items-center gap-3">
-              <button className="p-2 rounded-full bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors">
-                  <Search size={18} className="text-gray-600" />
-              </button>
-              <button className="p-2 rounded-full bg-white border border-gray-200 shadow-sm relative hover:bg-gray-50 transition-colors">
-                  <Bell size={18} className="text-gray-600" />
-                  <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-              </button>
-              <button 
-                onClick={handleLogout}
-                className="md:hidden p-2 rounded-full bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 transition-colors"
-                title="Logout"
-              >
-                  <LogOut size={18} />
-              </button>
-          </div>
-        </header>
-
-        <main className="px-4 md:px-8 max-w-7xl mx-auto">
-          {/* Banner Section */}
-          <HeroBanner />
-
-          {/* Categories Section */}
-          <section className="mb-6">
-              <CategoryRow />
-          </section>
-
-          {/* Offers Section */}
-          <FeaturedOffersGrid />
-
-        </main>
-      </div>
-
-      {/* Bottom Navigation (Mobile Only) */}
-      <div className="md:hidden">
-        <BottomNavigation />
-      </div>
-    </div>
-  );
-};
+import { APP_ROUTES } from './routes/appRoutes';
+import { getUserRoutes, getAdminRoutes } from './config/routesConfig';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -135,7 +20,22 @@ const Home = () => {
   // Redirect to dashboard if already authenticated
   useEffect(() => {
     if (isAuthenticated()) {
-      navigate('/dashboard');
+      // Check user type from localStorage
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser);
+          if (userData.userType === 'admin') {
+            navigate(APP_ROUTES.ADMIN_DASHBOARD);
+          } else {
+            navigate(APP_ROUTES.USER_DASHBOARD);
+          }
+        } catch {
+          navigate(APP_ROUTES.USER_DASHBOARD);
+        }
+      } else {
+        navigate(APP_ROUTES.USER_DASHBOARD);
+      }
     }
   }, [navigate]);
 
@@ -156,10 +56,10 @@ const Home = () => {
       // Fetch user by ID to get complete user data
       console.log('handleRegisterSuccess: Fetching user by ID:', data.user._id);
       await fetchUserData(data.user._id);
-      navigate('/dashboard');
+      navigate(APP_ROUTES.USER_DASHBOARD);
     } else {
       console.warn('handleRegisterSuccess: No user ID found in response');
-      navigate('/dashboard');
+      navigate(APP_ROUTES.USER_DASHBOARD);
     }
   };
 
@@ -168,24 +68,49 @@ const Home = () => {
     const data = responseData?.data || responseData;
     
     if (data.token) {
-      // Login returns token, so decode and fetch user by ID
+      // Login returns token, so decode and fetch user data
       console.log('handleLoginSuccess: Token received, fetching user data');
       await login(data.token, data.user);
-      navigate('/dashboard');
+      
+      // Check user type and redirect accordingly
+      const userType = data.user?.userType;
+      if (userType === 'admin') {
+        navigate(APP_ROUTES.ADMIN_DASHBOARD);
+      } else {
+        navigate(APP_ROUTES.USER_DASHBOARD);
+      }
     } else if (data.user?._id) {
       // If no token but user data, fetch user by ID
       console.log('handleLoginSuccess: No token, fetching user by ID:', data.user._id);
-      await fetchUserData(data.user._id);
-      navigate('/dashboard');
+      const fetchedUserData = await fetchUserData(data.user._id);
+      
+      // Check user type after fetching
+      if (fetchedUserData?.userType === 'admin') {
+        navigate(APP_ROUTES.ADMIN_DASHBOARD);
+      } else {
+        navigate(APP_ROUTES.USER_DASHBOARD);
+      }
     } else {
       console.warn('handleLoginSuccess: No token or user ID found');
-      navigate('/dashboard');
+      navigate(APP_ROUTES.USER_DASHBOARD);
     }
   };
 
   // If authenticated, don't show home
   if (isAuthenticated()) {
-    return <Navigate to="/dashboard" replace />;
+    // Check user type and redirect accordingly
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        if (userData.userType === 'admin') {
+          return <Navigate to={APP_ROUTES.ADMIN_DASHBOARD} replace />;
+        }
+      } catch {
+        // Fall through to default redirect
+      }
+    }
+    return <Navigate to={APP_ROUTES.USER_DASHBOARD} replace />;
   }
 
   return (
@@ -210,14 +135,48 @@ const Home = () => {
 };
 
 function App() {
+  // Get routes from centralized config
+  const userRoutes = getUserRoutes();
+  const adminRoutes = getAdminRoutes();
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<UserProfile />} />
-        <Route path="/wallet" element={<WalletPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Public Routes */}
+        <Route path={APP_ROUTES.HOME} element={<Home />} />
+        
+        {/* User Routes with UserLayout */}
+        <Route element={<UserLayout />}>
+          {userRoutes.map((route) => {
+            const RouteComponent = route.element;
+            if (!RouteComponent) return null;
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={<RouteComponent />}
+              />
+            );
+          })}
+        </Route>
+        
+        {/* Admin Routes with AdminLayout */}
+        <Route element={<AdminLayout />}>
+          {adminRoutes.map((route) => {
+            const RouteComponent = route.element;
+            if (!RouteComponent) return null;
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={<RouteComponent />}
+              />
+            );
+          })}
+        </Route>
+        
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to={APP_ROUTES.HOME} replace />} />
       </Routes>
     </Router>
   );

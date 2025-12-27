@@ -21,7 +21,7 @@ export const UserProvider = ({ children }) => {
     try {
       if (!userId) {
         console.warn('fetchUserData: userId is missing');
-        return;
+        return null;
       }
       
       console.log('fetchUserData: Calling getUserById for userId:', userId);
@@ -35,11 +35,14 @@ export const UserProvider = ({ children }) => {
         setUser(userData);
         // Store user in localStorage
         localStorage.setItem('user', JSON.stringify(userData));
+        return userData;
       } else {
         console.warn('fetchUserData: No user data in response', response);
+        return null;
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
+      return null;
     }
   };
 
