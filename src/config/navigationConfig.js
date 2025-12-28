@@ -1,4 +1,4 @@
-import { Home, Banknote, Trophy, HelpCircle, LayoutDashboard, Users, Activity, Settings } from 'lucide-react';
+import { Home, Banknote, Trophy, HelpCircle, LayoutDashboard, Users, Activity, Settings, Gift, BarChart3, TrendingUp } from 'lucide-react';
 import { APP_ROUTES } from '../routes/appRoutes';
 
 // Centralized Navigation Configuration
@@ -58,8 +58,32 @@ export const navigationConfig = {
       showInBottomNav: false,
     },
     {
-      id: 'admin-transactions',
+      id: 'admin-offers',
+      icon: Gift,
+      label: 'Manage Offers',
+      path: APP_ROUTES.ADMIN_OFFERS,
+      showInSidebar: true,
+      showInBottomNav: false,
+    },
+    {
+      id: 'admin-trackings',
       icon: Activity,
+      label: 'Trackings',
+      path: APP_ROUTES.ADMIN_TRACKINGS,
+      showInSidebar: true,
+      showInBottomNav: false,
+    },
+    {
+      id: 'admin-analytics',
+      icon: BarChart3,
+      label: 'Analytics',
+      path: APP_ROUTES.ADMIN_ANALYTICS,
+      showInSidebar: true,
+      showInBottomNav: false,
+    },
+    {
+      id: 'admin-transactions',
+      icon: TrendingUp,
       label: 'Transactions',
       path: APP_ROUTES.ADMIN_TRANSACTIONS,
       showInSidebar: true,

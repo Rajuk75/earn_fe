@@ -11,6 +11,9 @@ export const APP_ROUTES = {
   // Admin Routes
   ADMIN_DASHBOARD: '/admin-dashboard',
   ADMIN_USERS: '/admin/users',
+  ADMIN_OFFERS: '/admin/offers',
+  ADMIN_TRACKINGS: '/admin/trackings',
+  ADMIN_ANALYTICS: '/admin/analytics',
   ADMIN_TRANSACTIONS: '/admin/transactions',
   ADMIN_SETTINGS: '/admin/settings',
   
@@ -63,6 +66,24 @@ export const routeConfig = {
   },
   [APP_ROUTES.ADMIN_USERS]: {
     name: 'Manage Users',
+    requiresAuth: true,
+    layout: 'admin',
+    userTypes: ['admin'],
+  },
+  [APP_ROUTES.ADMIN_OFFERS]: {
+    name: 'Manage Offers',
+    requiresAuth: true,
+    layout: 'admin',
+    userTypes: ['admin'],
+  },
+  [APP_ROUTES.ADMIN_TRACKINGS]: {
+    name: 'Trackings',
+    requiresAuth: true,
+    layout: 'admin',
+    userTypes: ['admin'],
+  },
+  [APP_ROUTES.ADMIN_ANALYTICS]: {
+    name: 'Analytics',
     requiresAuth: true,
     layout: 'admin',
     userTypes: ['admin'],

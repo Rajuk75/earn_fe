@@ -88,7 +88,7 @@ const FeaturedOffersGrid = () => {
       amount: offer.amount?.toLocaleString('en-IN') || '0',
       logo: logoComponent,
       description: offer.description,
-      posthookUrl: offer.posthookUrl,
+      providerUrl: offer.providerUrl, // Provider URL for redirect
       trackingStatus, // Add tracking status
     };
   };

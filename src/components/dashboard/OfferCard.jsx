@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { trackOfferClick, trackOfferCompletion } from '../../services/core.service';
+import { trackOfferClick } from '../../services/core.service';
 import { useUser } from '../../context/UserContext';
 
-const OfferCard = ({ id, logo, name, amount, description, posthookUrl, trackingStatus }) => {
+const OfferCard = ({ id, logo, name, amount, description, providerUrl, trackingStatus }) => {
   const { user } = useUser();
   const [loading, setLoading] = useState(false);
   const [completed, setCompleted] = useState(trackingStatus === 'completed');
@@ -17,32 +17,31 @@ const OfferCard = ({ id, logo, name, amount, description, posthookUrl, trackingS
     try {
       setLoading(true);
       
-      // Track offer click
-      await trackOfferClick(id);
-      console.log('Offer click tracked:', id);
-
-      // If posthookUrl exists, open in new tab and track completion
-      if (posthookUrl) {
-        // Open offer URL in new tab
-        window.open(posthookUrl, '_blank', 'noopener,noreferrer');
+      // Step 1: Track offer click and get redirectUrl with clickId
+      const response = await trackOfferClick(id);
+      console.log('Offer click tracked:', response);
+      
+      // Extract redirectUrl from response
+      const redirectUrl = response?.data?.tracking?.redirectUrl;
+      const clickId = response?.data?.tracking?.clickId;
+      
+      if (redirectUrl) {
+        // Step 2: Redirect user to provider URL with clickId parameter
+        console.log('Redirecting to provider URL:', redirectUrl);
+        window.open(redirectUrl, '_blank', 'noopener,noreferrer');
         
-        // Track completion after a short delay (assuming user will complete the offer)
-        // In real scenario, you might want to track completion when user returns or via webhook
-        setTimeout(async () => {
-          try {
-            await trackOfferCompletion(id, {
-              completedVia: 'external_link',
-              posthookUrl,
-            });
-            setCompleted(true);
-            console.log('Offer completion tracked:', id);
-          } catch (error) {
-            console.error('Error tracking offer completion:', error);
-          }
-        }, 2000); // 2 second delay to allow page to open
+        // Note: Completion will be handled by webhook when provider sends postback
+        // Step 3-5: Provider will call POST /v1/offer/webhook with clickId
+        // Backend will automatically:
+        // - Find tracking by clickId
+        // - Mark as completed
+        // - Credit wallet
+      } else if (providerUrl) {
+        // Fallback: If redirectUrl not available but providerUrl exists, use it directly
+        console.log('Using providerUrl directly:', providerUrl);
+        window.open(providerUrl, '_blank', 'noopener,noreferrer');
       } else {
-        // If no posthookUrl, just mark as clicked
-        setCompleted(true);
+        console.warn('No redirectUrl or providerUrl available for offer:', id);
       }
     } catch (error) {
       console.error('Error tracking offer click:', error);

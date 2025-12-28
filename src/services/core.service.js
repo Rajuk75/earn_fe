@@ -194,3 +194,38 @@ export const deleteOffer = async (offerId) => {
   }
 };
 
+// Admin only - Trackings and Analytics
+export const getAllTrackings = async (params = {}) => {
+  try {
+    const queryString = new URLSearchParams(params).toString();
+    const endpoint = queryString 
+      ? `v1/offer/trackings?${queryString}`
+      : 'v1/offer/trackings';
+    
+    const response = await callApi({
+      endpoint,
+      method: 'GET',
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAnalytics = async (params = {}) => {
+  try {
+    const queryString = new URLSearchParams(params).toString();
+    const endpoint = queryString 
+      ? `v1/offer/analytics?${queryString}`
+      : 'v1/offer/analytics';
+    
+    const response = await callApi({
+      endpoint,
+      method: 'GET',
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+

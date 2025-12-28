@@ -3,6 +3,10 @@ import UserProfile from '../pages/UserProfile';
 import WalletPage from '../pages/Wallet';
 import Leaderboards from '../pages/Leaderboards';
 import AdminDashboard from '../pages/AdminDashboard';
+import AdminUsers from '../pages/AdminUsers';
+import AdminOffers from '../pages/AdminOffers';
+import AdminTrackings from '../pages/AdminTrackings';
+import AdminAnalytics from '../pages/AdminAnalytics';
 import { APP_ROUTES } from '../routes/appRoutes';
 import UserLayout from '../layouts/UserLayout';
 import AdminLayout from '../layouts/AdminLayout';
@@ -56,7 +60,25 @@ export const routesConfig = {
     },
     {
       path: APP_ROUTES.ADMIN_USERS,
-      element: null, // To be created
+      element: AdminUsers,
+      requiresAuth: true,
+      userTypes: ['admin'],
+    },
+    {
+      path: APP_ROUTES.ADMIN_OFFERS,
+      element: AdminOffers,
+      requiresAuth: true,
+      userTypes: ['admin'],
+    },
+    {
+      path: APP_ROUTES.ADMIN_TRACKINGS,
+      element: AdminTrackings,
+      requiresAuth: true,
+      userTypes: ['admin'],
+    },
+    {
+      path: APP_ROUTES.ADMIN_ANALYTICS,
+      element: AdminAnalytics,
       requiresAuth: true,
       userTypes: ['admin'],
     },
