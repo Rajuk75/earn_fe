@@ -4,8 +4,8 @@ import { ROOT_ROUTE } from "../constants/routeEnums";
 import { ENV_LOCAL, USER_TYPE } from "../constants/userRoles";
 
 const API_URL = import.meta.env.VITE_APP_STAGE === ENV_LOCAL 
-  ? import.meta.env.VITE_API_URL || 'https://api.earnhubofficial.in/'
-  : import.meta.env.VITE_API_URL || 'https://api.earnhubofficial.in/';
+  ? import.meta.env.VITE_API_URL || 'https://api.earnhubofficial.in'
+  : import.meta.env.VITE_API_URL || 'https://api.earnhubofficial.in';
 
 // Storage service functions
 const storageService = {
