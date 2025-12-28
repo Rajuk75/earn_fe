@@ -119,7 +119,10 @@ const Home = () => {
         onLoginClick={handleLoginClick}
         onRegisterClick={handleRegisterClick}
       />
-      <LandingPage onRegisterClick={handleRegisterClick} />
+      <LandingPage 
+        onRegisterClick={handleRegisterClick}
+        onLoginClick={handleLoginClick}
+      />
       <RegisterModal
         isOpen={showRegisterModal}
         onClose={() => setShowRegisterModal(false)}
